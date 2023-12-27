@@ -24,7 +24,7 @@ fun AppNavigation() {
         }
         composable(
             route = "detail/{appointmentId}",
-            arguments = listOf(navArgument("appointmentId") { type = NavType.IntType })
+            arguments = listOf(navArgument("appointmentId") { type = NavType.StringType })
         ) {
             AppointmentDetailScreen {
                 navController.navigateUp()

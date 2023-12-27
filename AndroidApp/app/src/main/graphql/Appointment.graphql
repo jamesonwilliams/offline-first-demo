@@ -1,0 +1,7 @@
+fragment appointmentFragment on Appointment {
+    id
+    patientName
+    startTime
+    endTime
+    status
+}

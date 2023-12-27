@@ -2,6 +2,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.apollo)
     alias(libs.plugins.com.google.devtools.ksp)
     alias(libs.plugins.com.google.dagger.hilt.android)
 }
@@ -52,17 +53,15 @@ android {
     }
 }
 
+apollo {
+    service("appointments") {
+        packageName.set("org.nosemaj.cra")
+    }
+}
+
 dependencies {
     // Network
-    ksp(libs.moshi.kotlin.codegen)
-    implementation(libs.converter.moshi)
-    implementation(libs.moshi)
-    implementation(libs.retrofit)
-
-    // Room
-    ksp(libs.room.compiler)
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
+    implementation(libs.apollo.runtime)
 
     // Hilt
     ksp(libs.hilt.compiler)

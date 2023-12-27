@@ -1,7 +1,6 @@
 package org.nosemaj.cra.ui.details
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -26,7 +25,6 @@ import org.nosemaj.cra.ui.details.UiState.Error
 import org.nosemaj.cra.ui.details.UiState.Loading
 import org.nosemaj.cra.ui.shared.ErrorUi
 import org.nosemaj.cra.ui.shared.LoadingUI
-import org.nosemaj.cra.ui.shared.RemoteImage
 
 @Composable
 fun AppointmentDetailScreen(onBackPressed: () -> Unit) {
@@ -43,7 +41,7 @@ fun AppointmentDetailScreen(onBackPressed: () -> Unit) {
         }
 
         is Error -> {
-            ErrorUi(currentState.errorMessage) {
+            ErrorUi(currentState.message) {
                 viewModel.onEvent(UiEvent.RetryClicked)
             }
         }
@@ -55,23 +53,15 @@ fun AppointmentDetailUi(appointmentDetail: AppointmentDetail, onBackClicked: () 
     Column(
         modifier = Modifier.fillMaxHeight()
     ) {
-        Box {
-            RemoteImage(
-                imageUrl = appointmentDetail.imageUrl,
-                contentDescription = appointmentDetail.name
-            )
-            BackBar {
-                onBackClicked()
-            }
-        }
-
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            TitleLine(appointmentDetail.name)
-            DetailLine(appointmentDetail.gender)
-            DetailLine(appointmentDetail.species)
-            DetailLine(appointmentDetail.status)
+            BackBar {
+                onBackClicked()
+            }
+            TitleLine(appointmentDetail.patientName)
+            DetailLine("${appointmentDetail.startTime} • ${appointmentDetail.endTime}")
+            DetailLine(appointmentDetail.status.name)
         }
     }
 }

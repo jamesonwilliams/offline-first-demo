@@ -1,0 +1,5 @@
+subscription AppointmentChange {
+    appointmentChange {
+        ...appointmentFragment
+    }
+}

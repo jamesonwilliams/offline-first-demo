@@ -1,0 +1,5 @@
+query GetAppointment($id: ID!) {
+    getAppointment(id: $id) {
+        ...appointmentFragment
+    }
+}

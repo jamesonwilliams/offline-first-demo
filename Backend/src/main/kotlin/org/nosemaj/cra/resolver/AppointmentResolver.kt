@@ -24,7 +24,7 @@ class AppointmentResolver
         }
 
         @QueryMapping
-        fun getAppointment(id: UUID): Appointment? {
+        fun getAppointment(@Argument id: UUID): Appointment? {
             return appointmentService.getAppointment(id)
         }
 
