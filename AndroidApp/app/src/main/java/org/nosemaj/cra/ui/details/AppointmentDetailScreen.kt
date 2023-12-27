@@ -51,17 +51,14 @@ fun AppointmentDetailScreen(onBackPressed: () -> Unit) {
 }
 
 @Composable
-fun AppointmentDetailUi(
-    appointmentDetail: AppointmentDetail,
-    onBackClicked: () -> Unit,
-) {
+fun AppointmentDetailUi(appointmentDetail: AppointmentDetail, onBackClicked: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxHeight()
     ) {
         Box {
             RemoteImage(
                 imageUrl = appointmentDetail.imageUrl,
-                contentDescription = appointmentDetail.name,
+                contentDescription = appointmentDetail.name
             )
             BackBar {
                 onBackClicked()
@@ -92,7 +89,7 @@ fun TitleLine(text: String) {
 fun DetailLine(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.titleLarge,
+        style = MaterialTheme.typography.titleLarge
     )
 }
 

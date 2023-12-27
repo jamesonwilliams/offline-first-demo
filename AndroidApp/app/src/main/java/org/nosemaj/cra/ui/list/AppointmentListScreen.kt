@@ -30,9 +30,7 @@ import org.nosemaj.cra.ui.shared.LoadingUI
 import org.nosemaj.cra.ui.shared.RemoteImage
 
 @Composable
-fun AppointmentListScreen(
-    navigateToAppointment: (appointmentId: Int) -> Unit,
-) {
+fun AppointmentListScreen(navigateToAppointment: (appointmentId: Int) -> Unit) {
     val viewModel: AppointmentListViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = true) {
@@ -68,7 +66,7 @@ fun AppointmentListScreen(
 fun AppointmentList(
     appointmentSummaries: List<AppointmentSummary>,
     onBottomReached: () -> Unit,
-    onAppointmentClicked: (AppointmentSummary) -> Unit,
+    onAppointmentClicked: (AppointmentSummary) -> Unit
 ) {
     val columnCount = when (LocalConfiguration.current.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> 4
@@ -92,7 +90,7 @@ fun AppointmentList(
 fun AppointmentItem(
     appointmentSummary: AppointmentSummary,
     modifier: Modifier = Modifier,
-    onClicked: () -> Unit,
+    onClicked: () -> Unit
 ) {
     Box(
         modifier = modifier.clickable { onClicked() }

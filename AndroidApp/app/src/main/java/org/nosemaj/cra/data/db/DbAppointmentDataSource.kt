@@ -34,13 +34,13 @@ class DbAppointmentDataSource @Inject constructor(applicationContext: Context) {
         }
     }
 
-    suspend fun storeAppointments(vararg dbAppointment: AppointmentModel): Result<List<AppointmentModel>> {
-        return try {
-            db.appointmentDao().insertAll(*dbAppointment)
-            Result.success(dbAppointment.toList())
-        } catch (thr: Throwable) {
-            val ids = dbAppointment.map { it.id }
-            Result.failure(Throwable("Unable to insert appointments $ids to database.", thr))
-        }
+    suspend fun storeAppointments(
+        vararg dbAppointment: AppointmentModel
+    ): Result<List<AppointmentModel>> = try {
+        db.appointmentDao().insertAll(*dbAppointment)
+        Result.success(dbAppointment.toList())
+    } catch (thr: Throwable) {
+        val ids = dbAppointment.map { it.id }
+        Result.failure(Throwable("Unable to insert appointments $ids to database.", thr))
     }
 }

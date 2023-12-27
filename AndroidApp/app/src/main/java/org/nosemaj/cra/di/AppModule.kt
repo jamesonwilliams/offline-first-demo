@@ -12,12 +12,8 @@ import org.nosemaj.cra.data.net.AppointmentService
 @InstallIn(SingletonComponent::class)
 object AppModule {
     @Provides
-    fun providesAppointmentService(): AppointmentService {
-        return AppointmentService.create()
-    }
+    fun providesAppointmentService(): AppointmentService = AppointmentService.create()
 
     @Provides
-    fun provideApplicationContext(application: Application): Context {
-        return application
-    }
+    fun provideApplicationContext(application: Application): Context = application
 }

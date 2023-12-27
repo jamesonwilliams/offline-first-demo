@@ -47,7 +47,9 @@ class AppointmentListViewModel @Inject constructor(
                         .map { AppointmentSummary(id = it.id, name = it.name, imageUrl = it.image) }
                     _uiState.update {
                         it.copy(
-                            appointmentSummaries = it.appointmentSummaries.plus(appointmentSummaries),
+                            appointmentSummaries = it.appointmentSummaries.plus(
+                                appointmentSummaries
+                            ),
                             displayState = DisplayState.CONTENT,
                             currentPage = it.currentPage + 1
                         )
@@ -93,8 +95,4 @@ enum class DisplayState {
     ERROR
 }
 
-data class AppointmentSummary(
-    val id: Int,
-    val name: String,
-    val imageUrl: String
-)
+data class AppointmentSummary(val id: Int, val name: String, val imageUrl: String)

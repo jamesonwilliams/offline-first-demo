@@ -15,12 +15,11 @@ interface AppointmentService {
     suspend fun getAppointment(appointmentId: Int): Response<AppointmentModel>
 
     companion object {
-        fun create(baseUrl: String = "https://cra.nosemaj.org/v1/"): AppointmentService {
-            return Retrofit.Builder()
+        fun create(baseUrl: String = "https://cra.nosemaj.org/v1/"): AppointmentService =
+            Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(MoshiConverterFactory.create())
                 .build()
                 .create(AppointmentService::class.java)
-        }
     }
 }
