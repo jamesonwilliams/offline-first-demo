@@ -1,0 +1,40 @@
+type Query {
+    listAppointments: [Appointment!]!
+    getAppointment(id: ID!): Appointment
+}
+
+type Mutation {
+    addAppointment(
+        patientName: String!
+        startTime: String!
+        endTime: String!
+    ): Appointment!
+
+    modifyAppointment(
+        id: ID!
+        patientName: String
+        startTime: String
+        endTime: String
+        status: AppointmentStatus
+    ): Appointment!
+}
+
+type Subscription {
+    appointmentChange: Appointment!
+}
+
+type Appointment {
+    id: ID!
+    patientName: String!
+    startTime: String!
+    endTime: String!
+    status: AppointmentStatus!
+}
+
+enum AppointmentStatus {
+    Scheduled
+    Recording
+    Paused
+    Completed
+    Cancelled
+}
