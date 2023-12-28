@@ -28,7 +28,7 @@ fun ErrorUi(message: String?, onRetryClicked: () -> Unit) {
             text = errorMessage,
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(16.dp),
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.padding(10.dp))
         Button(
@@ -37,7 +37,7 @@ fun ErrorUi(message: String?, onRetryClicked: () -> Unit) {
         ) {
             Text(
                 text = "Retry?",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleLarge
             )
         }
     }

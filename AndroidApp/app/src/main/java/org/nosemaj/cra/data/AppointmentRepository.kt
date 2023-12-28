@@ -1,16 +1,17 @@
 package org.nosemaj.cra.data
 
-import org.nosemaj.cra.data.net.NetworkAppointmentDataSource
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import org.nosemaj.cra.data.net.NetworkAppointmentDataSource
 
 class AppointmentRepository @Inject constructor(
     private val networkAppointmentDataSource: NetworkAppointmentDataSource
 ) {
-    suspend fun loadAppointments(): Result<List<AppointmentModel>> {
-        return networkAppointmentDataSource.listAppointments()
-    }
+    fun monitorAppointments(): Flow<List<AppointmentModel>> =
+        networkAppointmentDataSource.currentAppointments
 
-    suspend fun getAppointment(appointmentId: String): Result<AppointmentModel> {
-        return networkAppointmentDataSource.getAppointment(appointmentId)
-    }
+    suspend fun getAppointment(appointmentId: String): Result<AppointmentModel> =
+        networkAppointmentDataSource.getAppointment(
+            appointmentId
+        )
 }

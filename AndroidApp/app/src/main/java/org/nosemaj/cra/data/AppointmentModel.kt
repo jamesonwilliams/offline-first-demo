@@ -5,13 +5,13 @@ data class AppointmentModel(
     val patientName: String,
     val startTime: String,
     val endTime: String,
-    val status: AppointmentStatus,
+    val status: AppointmentStatus
 ) {
     enum class AppointmentStatus {
         Scheduled,
         Recording,
         Paused,
         Completed,
-        Cancelled,
+        Cancelled
     }
 }

@@ -57,10 +57,7 @@ fun AppointmentList(
 }
 
 @Composable
-fun AppointmentItem(
-    appointmentSummary: AppointmentSummary,
-    onClicked: () -> Unit
-) {
+fun AppointmentItem(appointmentSummary: AppointmentSummary, onClicked: () -> Unit) {
     Column(
         modifier = Modifier.clickable { onClicked() }
             .fillMaxWidth()
@@ -74,7 +71,7 @@ fun AppointmentItem(
         with(appointmentSummary) {
             Text(
                 style = MaterialTheme.typography.headlineLarge,
-                text = patientName,
+                text = patientName
             )
             Text(
                 style = MaterialTheme.typography.headlineSmall,

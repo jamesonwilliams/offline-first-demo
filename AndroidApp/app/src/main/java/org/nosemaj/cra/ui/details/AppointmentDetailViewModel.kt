@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,8 +16,9 @@ import org.nosemaj.cra.data.AppointmentModel.AppointmentStatus
 import org.nosemaj.cra.data.AppointmentRepository
 import org.nosemaj.cra.ui.details.UiEvent.InitialLoad
 import org.nosemaj.cra.ui.details.UiEvent.RetryClicked
+import org.nosemaj.cra.ui.details.UiState.Content
+import org.nosemaj.cra.ui.details.UiState.Error
 import org.nosemaj.cra.ui.details.UiState.Loading
-import javax.inject.Inject
 
 @HiltViewModel
 class AppointmentDetailViewModel @Inject constructor(
@@ -35,27 +37,31 @@ class AppointmentDetailViewModel @Inject constructor(
     }
 
     private fun loadAppointment() {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                appointmentRepository.getAppointment(appointmentId = appointmentId)
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            updateState { Loading }
+
+            appointmentRepository.getAppointment(appointmentId = appointmentId)
                 .onSuccess { appointment ->
-                    _uiState.update {
-                        UiState.Content(
+                    updateState {
+                        Content(
                             AppointmentDetail(
                                 id = appointment.id,
                                 patientName = appointment.patientName,
                                 startTime = appointment.startTime,
                                 endTime = appointment.endTime,
-                                status = appointment.status,
+                                status = appointment.status
                             )
                         )
                     }
                 }
                 .onFailure { error ->
-                    _uiState.update { UiState.Error(error.localizedMessage) }
+                    updateState { Error(error.localizedMessage) }
                 }
         }
+    }
+
+    private suspend fun updateState(updater: (oldState: UiState) -> UiState) {
+        withContext(Dispatchers.Main) { _uiState.update(updater) }
     }
 }
 
@@ -75,5 +81,5 @@ data class AppointmentDetail(
     val patientName: String,
     val startTime: String,
     val endTime: String,
-    val status: AppointmentStatus,
+    val status: AppointmentStatus
 )
