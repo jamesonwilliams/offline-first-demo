@@ -15,6 +15,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,12 +51,28 @@ fun AppointmentList(
     onAppointmentClicked: (AppointmentSummary) -> Unit
 ) {
     LazyColumn {
+        item {
+            Title("Appointments")
+        }
         items(appointmentSummaries) { summary ->
             AppointmentItem(appointmentSummary = summary) {
                 onAppointmentClicked(summary)
             }
         }
     }
+}
+
+@Composable
+fun Title(text: String) {
+    Text(
+        text = "Appointments",
+        style = MaterialTheme.typography.headlineLarge,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .padding(top = 16.dp, bottom = 16.dp)
+            .fillMaxWidth(),
+        fontWeight = FontWeight.ExtraBold,
+    )
 }
 
 @Composable
