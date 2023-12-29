@@ -1,17 +1,23 @@
 package org.nosemaj.cra.data
 
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import org.nosemaj.cra.data.net.NetworkAppointmentDataSource
+import kotlinx.datetime.Clock
+import org.nosemaj.cra.data.db.AppointmentDao
+import java.util.UUID
+import javax.inject.Inject
 
 class AppointmentRepository @Inject constructor(
-    private val networkAppointmentDataSource: NetworkAppointmentDataSource
+    private val appointmentDao: AppointmentDao,
 ) {
-    fun monitorAppointments(): Flow<List<AppointmentModel>> =
-        networkAppointmentDataSource.currentAppointments
+    fun getAppointments(): Flow<List<AppointmentModel>> {
+        return appointmentDao.observeAll()
+    }
 
-    suspend fun getAppointment(appointmentId: String): Result<AppointmentModel> =
-        networkAppointmentDataSource.getAppointment(
-            appointmentId
-        )
+    fun getAppointment(appointmentId: UUID): Flow<AppointmentModel> {
+        return appointmentDao.observeById(appointmentId)
+    }
+
+    suspend fun saveAppointment(appointment: AppointmentModel) {
+        appointmentDao.upsert(appointment.copy(lastUpdated = Clock.System.now()))
+    }
 }

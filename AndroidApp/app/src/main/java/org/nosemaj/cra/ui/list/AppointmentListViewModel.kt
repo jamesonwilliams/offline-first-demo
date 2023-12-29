@@ -3,13 +3,14 @@ package org.nosemaj.cra.ui.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -22,6 +23,9 @@ import org.nosemaj.cra.ui.list.UiEvent.RetryClicked
 import org.nosemaj.cra.ui.list.UiState.Content
 import org.nosemaj.cra.ui.list.UiState.Error
 import org.nosemaj.cra.ui.list.UiState.Loading
+import org.nosemaj.cra.ui.shared.toFriendlyString
+import java.util.UUID
+import javax.inject.Inject
 
 @HiltViewModel
 class AppointmentListViewModel @Inject constructor(
@@ -40,25 +44,16 @@ class AppointmentListViewModel @Inject constructor(
     }
 
     private fun refreshUi(showLoading: Boolean = true) {
-        appointmentRepository.monitorAppointments()
+        appointmentSummaries()
             .onStart {
                 if (showLoading) {
                     updateState { Loading }
                 }
             }
-            .onEach { appointments ->
-                val appointmentSummaries = appointments.map {
-                    AppointmentSummary(
-                        id = it.id,
-                        patientName = it.patientName,
-                        startTime = it.startTime,
-                        endTime = it.endTime,
-                        status = it.status
-                    )
-                }
+            .onEach { summaries ->
                 updateState {
-                    if (appointmentSummaries.isNotEmpty()) {
-                        Content(appointmentSummaries = appointmentSummaries)
+                    if (summaries.isNotEmpty()) {
+                        Content(summaries)
                     } else {
                         Error("No appointments to show!")
                     }
@@ -68,6 +63,21 @@ class AppointmentListViewModel @Inject constructor(
                 updateState { Error(throwable.localizedMessage) }
             }
             .launchIn(viewModelScope + Dispatchers.IO)
+    }
+
+    private fun appointmentSummaries(): Flow<List<AppointmentSummary>> {
+        return appointmentRepository.getAppointments()
+            .map { models ->
+                models.map {
+                    AppointmentSummary(
+                        id = it.id,
+                        patientName = it.patientName,
+                        startTime = it.startTime.toFriendlyString(),
+                        endTime = it.endTime.toFriendlyString(),
+                        status = it.status
+                    )
+                }
+            }
     }
 
     private suspend fun updateState(updater: (oldState: UiState) -> UiState) {
@@ -87,7 +97,7 @@ sealed class UiState {
 }
 
 data class AppointmentSummary(
-    val id: String,
+    val id: UUID,
     val patientName: String,
     val startTime: String,
     val endTime: String,

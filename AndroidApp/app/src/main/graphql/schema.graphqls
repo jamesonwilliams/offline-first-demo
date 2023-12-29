@@ -8,6 +8,22 @@ type Appointment {
   endTime: String!
 
   status: AppointmentStatus!
+
+  lastUpdated: String!
+}
+
+input AppointmentInput {
+  id: ID!
+
+  patientName: String!
+
+  startTime: String!
+
+  endTime: String!
+
+  status: AppointmentStatus!
+
+  lastUpdated: String!
 }
 
 enum AppointmentStatus {
@@ -35,7 +51,9 @@ scalar ID
 type Mutation {
   addAppointment(patientName: String!, startTime: String!, endTime: String!): Appointment!
 
-  modifyAppointment(id: ID!, patientName: String, startTime: String, endTime: String, status: AppointmentStatus): Appointment!
+  modifyAppointment(id: ID!, patientName: String, startTime: String, endTime: String, status: AppointmentStatus, lastUpdated: String): Appointment!
+
+  syncAppointments(clientAppointments: [AppointmentInput!]!): [Appointment!]!
 }
 
 type Query {

@@ -4,4 +4,5 @@ fragment appointmentFragment on Appointment {
     startTime
     endTime
     status
+    lastUpdated
 }

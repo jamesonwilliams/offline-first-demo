@@ -10,7 +10,8 @@ import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.graphql.data.method.annotation.SubscriptionMapping
 import org.springframework.stereotype.Controller
 import reactor.core.publisher.Flux
-import java.util.UUID
+import java.time.OffsetDateTime
+import java.util.*
 
 @Controller
 class AppointmentResolver @Autowired constructor(
@@ -37,11 +38,19 @@ class AppointmentResolver @Autowired constructor(
                 Appointment(
                     id = UUID.randomUUID(),
                     patientName = patientName,
-                    startTime = startTime,
-                    endTime = endTime,
+                    startTime = OffsetDateTime.parse(startTime),
+                    endTime = OffsetDateTime.parse(endTime),
                     status = AppointmentStatus.Scheduled,
+                    lastUpdated = OffsetDateTime.now(),
                 ),
         )
+    }
+
+    @MutationMapping
+    fun syncAppointments(
+        @Argument clientAppointments: List<Appointment>
+    ): List<Appointment> {
+        return appointmentService.syncAppointments(clientAppointments)
     }
 
     @MutationMapping
@@ -59,10 +68,11 @@ class AppointmentResolver @Autowired constructor(
             requestedAppointment =
                 Appointment(
                     id = id,
-                    startTime = startTime ?: existingAppointment.startTime,
-                    endTime = endTime ?: existingAppointment.endTime,
+                    startTime = startTime?.let { OffsetDateTime.parse(it) } ?: existingAppointment.startTime,
+                    endTime = endTime?.let { OffsetDateTime.parse(it) } ?: existingAppointment.endTime,
                     patientName = patientName ?: existingAppointment.patientName,
                     status = status ?: existingAppointment.status,
+                    lastUpdated = OffsetDateTime.now(),
                 ),
         )
     }

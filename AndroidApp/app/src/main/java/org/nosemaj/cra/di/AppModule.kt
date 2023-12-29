@@ -1,7 +1,7 @@
 package org.nosemaj.cra.di
 
-import android.app.Application
 import android.content.Context
+import androidx.room.Room
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.network.ws.GraphQLWsProtocol
 import com.apollographql.apollo3.network.ws.WebSocketNetworkTransport
@@ -10,11 +10,17 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.nosemaj.cra.R
+import org.nosemaj.cra.data.db.AppDatabase
+import org.nosemaj.cra.data.db.AppointmentDao
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object NetworkModule {
     @Provides
     fun provideApolloClient(@ApplicationContext applicationContext: Context): ApolloClient =
         ApolloClient.Builder()
@@ -26,7 +32,31 @@ object AppModule {
             )
             .serverUrl(applicationContext.getString(R.string.gql_base_url))
             .build()
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DatabaseModule {
+    @Singleton
+    @Provides
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context.applicationContext,
+            AppDatabase::class.java,
+            AppDatabase::class.simpleName,
+        ).build()
+    }
 
     @Provides
-    fun provideApplicationContext(application: Application): Context = application
+    fun provideAppointmentDao(database: AppDatabase): AppointmentDao = database.appointmentDao()
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object CoroutineModule {
+    @Singleton
+    @Provides
+    fun provideCoroutineScope(): CoroutineScope {
+        return CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    }
 }

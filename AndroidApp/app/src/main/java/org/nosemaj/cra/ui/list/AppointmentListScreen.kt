@@ -22,9 +22,10 @@ import org.nosemaj.cra.ui.list.UiEvent.InitialLoad
 import org.nosemaj.cra.ui.list.UiEvent.RetryClicked
 import org.nosemaj.cra.ui.shared.ErrorUi
 import org.nosemaj.cra.ui.shared.LoadingUI
+import java.util.UUID
 
 @Composable
-fun AppointmentListScreen(navigateToAppointment: (appointmentId: String) -> Unit) {
+fun AppointmentListScreen(navigateToAppointment: (appointmentId: UUID) -> Unit) {
     val viewModel: AppointmentListViewModel = hiltViewModel()
 
     LaunchedEffect(key1 = true) {
@@ -74,8 +75,8 @@ fun AppointmentItem(appointmentSummary: AppointmentSummary, onClicked: () -> Uni
                 text = patientName
             )
             Text(
-                style = MaterialTheme.typography.headlineSmall,
-                text = "$startTime • $endTime • $status"
+                style = MaterialTheme.typography.titleLarge,
+                text = "$startTime • $status"
             )
         }
     }

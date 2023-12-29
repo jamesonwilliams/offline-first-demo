@@ -1,0 +1,9 @@
+mutation SyncAppointments(
+    $appointmentInputs: [AppointmentInput!]!
+) {
+    syncAppointments(
+        clientAppointments: $appointmentInputs
+    ) {
+        ...appointmentFragment
+    }
+}

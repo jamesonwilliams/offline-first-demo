@@ -42,6 +42,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
@@ -63,6 +64,12 @@ dependencies {
     // Network
     implementation(libs.apollo.runtime)
 
+    // Database
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    annotationProcessor(libs.androidx.room.compiler)
+
     // Hilt
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.android)
@@ -72,11 +79,14 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.activity.compose)
     implementation(libs.coil.compose)
+    implementation(libs.timber)
+    implementation(libs.kotlinx.datetime)
 
     // Lifecycle
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.process)
 
     // Navigation
     implementation(libs.navigation.compose)

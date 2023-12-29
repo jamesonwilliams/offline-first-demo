@@ -4,13 +4,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import kotlinx.coroutines.withContext
 import org.nosemaj.cra.data.AppointmentModel.AppointmentStatus
 import org.nosemaj.cra.data.AppointmentRepository
@@ -19,13 +24,16 @@ import org.nosemaj.cra.ui.details.UiEvent.RetryClicked
 import org.nosemaj.cra.ui.details.UiState.Content
 import org.nosemaj.cra.ui.details.UiState.Error
 import org.nosemaj.cra.ui.details.UiState.Loading
+import org.nosemaj.cra.ui.shared.toFriendlyString
+import java.util.UUID
+import javax.inject.Inject
 
 @HiltViewModel
 class AppointmentDetailViewModel @Inject constructor(
     private val appointmentRepository: AppointmentRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val appointmentId: String = checkNotNull(savedStateHandle["appointmentId"])
+    private val appointmentId = UUID.fromString(checkNotNull(savedStateHandle["appointmentId"]))
     private val _uiState = MutableStateFlow<UiState>(Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
@@ -37,27 +45,30 @@ class AppointmentDetailViewModel @Inject constructor(
     }
 
     private fun loadAppointment() {
-        viewModelScope.launch(Dispatchers.IO) {
-            updateState { Loading }
+        appointmentDetail()
+            .onStart {
+                updateState { Loading }
+            }
+            .onEach { detail ->
+                updateState { Content(detail) }
+            }
+            .catch { throwable ->
+                updateState { Error(throwable.localizedMessage) }
+            }
+            .launchIn(viewModelScope + Dispatchers.IO)
+    }
 
-            appointmentRepository.getAppointment(appointmentId = appointmentId)
-                .onSuccess { appointment ->
-                    updateState {
-                        Content(
-                            AppointmentDetail(
-                                id = appointment.id,
-                                patientName = appointment.patientName,
-                                startTime = appointment.startTime,
-                                endTime = appointment.endTime,
-                                status = appointment.status
-                            )
-                        )
-                    }
-                }
-                .onFailure { error ->
-                    updateState { Error(error.localizedMessage) }
-                }
-        }
+    private fun appointmentDetail(): Flow<AppointmentDetail> {
+        return appointmentRepository.getAppointment(appointmentId = appointmentId)
+            .map { appointment ->
+                AppointmentDetail(
+                    id = appointment.id,
+                    patientName = appointment.patientName,
+                    startTime = appointment.startTime.toFriendlyString(),
+                    endTime = appointment.endTime.toFriendlyString(),
+                    status = appointment.status
+                )
+            }
     }
 
     private suspend fun updateState(updater: (oldState: UiState) -> UiState) {
@@ -77,7 +88,7 @@ sealed class UiState {
 }
 
 data class AppointmentDetail(
-    val id: String,
+    val id: UUID,
     val patientName: String,
     val startTime: String,
     val endTime: String,

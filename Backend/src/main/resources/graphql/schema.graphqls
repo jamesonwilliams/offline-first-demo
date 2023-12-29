@@ -16,7 +16,21 @@ type Mutation {
         startTime: String
         endTime: String
         status: AppointmentStatus
+        lastUpdated: String,
     ): Appointment!
+
+    syncAppointments(
+        clientAppointments: [AppointmentInput!]!
+    ): [Appointment!]!
+}
+
+input AppointmentInput {
+    id: ID!
+    patientName: String!
+    startTime: String!
+    endTime: String!
+    status: AppointmentStatus!
+    lastUpdated: String!
 }
 
 type Subscription {
@@ -29,6 +43,7 @@ type Appointment {
     startTime: String!
     endTime: String!
     status: AppointmentStatus!
+    lastUpdated: String!
 }
 
 enum AppointmentStatus {

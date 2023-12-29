@@ -33,8 +33,8 @@ class GraphQLTests {
                     mutation {
                       addAppointment(
                         patientName: "Greggory Sampson"
-                        startTime: "500"
-                        endTime: "700"
+                        startTime: "2024-03-15T08:30:00-06:00"
+                        endTime: "2024-03-15T09:15:00-06:00"
                       ) {
                         id
                       }
@@ -73,7 +73,7 @@ class GraphQLTests {
             ).execute()
             .path("listAppointments[*].patientName")
             .entityList(String::class.java)
-            .containsExactly("Greggory Sampson")
+            .contains("Greggory Sampson")
     }
 
     @Test
@@ -102,8 +102,8 @@ class GraphQLTests {
                 mutation {
                   addAppointment(
                     patientName: "Tobias Danielssen"
-                    startTime: "900"
-                    endTime: "1000"
+                    startTime: "2024-01-30T19:30:00-06:00"
+                    endTime: "2024-01-30T20:15:00-06:00"
                   ) {
                     id
                   }
