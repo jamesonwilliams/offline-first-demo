@@ -19,6 +19,9 @@ interface AppointmentDao {
     @Query("SELECT * FROM appointmentmodel WHERE id = :appointmentId")
     suspend fun getById(appointmentId: UUID): AppointmentModel
 
+    @Query("SELECT * FROM appointmentmodel ORDER BY startTime ASC")
+    suspend fun getAll(): List<AppointmentModel>
+
     @Upsert
     suspend fun upsert(vararg appointment: AppointmentModel)
 

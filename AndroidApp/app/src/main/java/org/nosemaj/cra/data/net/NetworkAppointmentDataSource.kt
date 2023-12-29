@@ -2,9 +2,8 @@ package org.nosemaj.cra.data.net
 
 import com.apollographql.apollo3.ApolloClient
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.merge
 import kotlinx.datetime.Instant
 import org.nosemaj.cra.AppointmentChangeSubscription
 import org.nosemaj.cra.SyncAppointmentsMutation
@@ -21,15 +20,12 @@ import java.util.UUID
 import javax.inject.Inject
 
 class NetworkAppointmentDataSource @Inject constructor(private val apolloClient: ApolloClient) {
-    fun observeAppointments(currentAppointments: List<AppointmentModel>): Flow<List<AppointmentModel>> =
-        syncAppointments(currentAppointments).flatMapConcat { initialAppointments ->
-            monitorAppointmentChanges().scan(initialAppointments) { previousList, update ->
-                previousList
-                    .filter { it.id != update.id }
-                    .plus(update)
-                    .sortedBy { it.startTime }
-            }
-        }
+    fun observeAppointments(currentAppointments: List<AppointmentModel>): Flow<List<AppointmentModel>> {
+        return merge(
+            syncAppointments(currentAppointments),
+            monitorAppointmentChanges().map { listOf(it) }
+        )
+    }
 
     private fun monitorAppointmentChanges(): Flow<AppointmentModel> = apolloClient.subscription(
         AppointmentChangeSubscription()
