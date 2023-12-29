@@ -1,9 +1,10 @@
 package org.nosemaj.cra.ui.details
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -15,11 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.nosemaj.cra.data.AppointmentModel.AppointmentStatus.Recording
+import org.nosemaj.cra.ui.details.UiEvent.RecordRequested
 import org.nosemaj.cra.ui.details.UiState.Content
 import org.nosemaj.cra.ui.details.UiState.Error
 import org.nosemaj.cra.ui.details.UiState.Loading
@@ -36,10 +40,11 @@ fun AppointmentDetailScreen(onBackPressed: () -> Unit) {
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
     when (val currentState = viewState) {
         is Loading -> LoadingUI()
-        is Content -> AppointmentDetailUi(currentState.appointmentDetail) {
-            onBackPressed()
-        }
-
+        is Content -> AppointmentDetailUi(
+            appointmentDetail = currentState.appointmentDetail,
+            onBackClicked = onBackPressed,
+            onRecordingRequested = { viewModel.onEvent(RecordRequested(it)) },
+        )
         is Error -> {
             ErrorUi(currentState.message) {
                 viewModel.onEvent(UiEvent.RetryClicked)
@@ -49,19 +54,33 @@ fun AppointmentDetailScreen(onBackPressed: () -> Unit) {
 }
 
 @Composable
-fun AppointmentDetailUi(appointmentDetail: AppointmentDetail, onBackClicked: () -> Unit) {
+fun AppointmentDetailUi(
+    appointmentDetail: AppointmentDetail,
+    onBackClicked: () -> Unit,
+    onRecordingRequested: (Boolean) -> Unit,
+) {
     Column(
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
     ) {
+        BackBar {
+            onBackClicked()
+        }
         Column(
-            modifier = Modifier.padding(16.dp)
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier.fillMaxSize(),
         ) {
-            BackBar {
-                onBackClicked()
-            }
             TitleLine(appointmentDetail.patientName)
-            DetailLine("${appointmentDetail.startTime} • ${appointmentDetail.endTime}")
-            DetailLine(appointmentDetail.status.name)
+            DetailLine("Start: ${appointmentDetail.startTime}")
+            DetailLine("End: ${appointmentDetail.endTime}")
+            DetailLine("Status: ${appointmentDetail.status.name}")
+
+            RecordButton(
+                isRecording = appointmentDetail.status == Recording,
+                onRecordingRequested = onRecordingRequested,
+            )
         }
     }
 }
@@ -79,7 +98,8 @@ fun TitleLine(text: String) {
 fun DetailLine(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.titleLarge
+        style = MaterialTheme.typography.titleLarge,
+        modifier = Modifier.padding(8.dp)
     )
 }
 

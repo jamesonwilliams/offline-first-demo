@@ -16,6 +16,9 @@ interface AppointmentDao {
     @Query("SELECT * FROM appointmentmodel WHERE id = :appointmentId")
     fun observeById(appointmentId: UUID): Flow<AppointmentModel>
 
+    @Query("SELECT * FROM appointmentmodel WHERE id = :appointmentId")
+    suspend fun getById(appointmentId: UUID): AppointmentModel
+
     @Upsert
     suspend fun upsert(vararg appointment: AppointmentModel)
 

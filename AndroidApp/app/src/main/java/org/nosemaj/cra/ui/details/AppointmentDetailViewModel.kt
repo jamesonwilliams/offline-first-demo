@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.withContext
 import org.nosemaj.cra.data.AppointmentModel.AppointmentStatus
@@ -41,6 +42,20 @@ class AppointmentDetailViewModel @Inject constructor(
         when (uiEvent) {
             is InitialLoad -> loadAppointment()
             is RetryClicked -> loadAppointment()
+            is UiEvent.RecordRequested -> toggleRecordState(uiEvent.shouldRecord)
+        }
+    }
+
+    private fun toggleRecordState(shouldRecord: Boolean) {
+        viewModelScope.launch {
+            appointmentRepository.updateStatus(
+                appointmentId,
+                if (shouldRecord) {
+                    AppointmentStatus.Recording
+                } else {
+                    AppointmentStatus.Paused
+                }
+            )
         }
     }
 
@@ -79,6 +94,7 @@ class AppointmentDetailViewModel @Inject constructor(
 sealed class UiEvent {
     data object InitialLoad : UiEvent()
     data object RetryClicked : UiEvent()
+    data class RecordRequested(val shouldRecord: Boolean): UiEvent()
 }
 
 sealed class UiState {
