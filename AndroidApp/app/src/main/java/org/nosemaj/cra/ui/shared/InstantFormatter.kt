@@ -7,6 +7,7 @@ import kotlinx.datetime.toLocalDateTime
 fun Instant.toFriendlyString(): String {
     val localDateTime = this.toLocalDateTime(TimeZone.currentSystemDefault())
     return with(localDateTime) {
-        "$monthNumber/$dayOfMonth, $hour:$minute"
+        val mon = month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)
+        "%3s %d, %04d %d:%02d".format(mon, dayOfMonth, year, hour, minute)
     }
 }

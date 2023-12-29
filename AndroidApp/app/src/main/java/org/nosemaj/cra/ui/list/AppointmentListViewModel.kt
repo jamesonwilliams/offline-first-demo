@@ -68,15 +68,17 @@ class AppointmentListViewModel @Inject constructor(
     private fun appointmentSummaries(): Flow<List<AppointmentSummary>> {
         return appointmentRepository.getAppointments()
             .map { models ->
-                models.map {
-                    AppointmentSummary(
-                        id = it.id,
-                        patientName = it.patientName,
-                        startTime = it.startTime.toFriendlyString(),
-                        endTime = it.endTime.toFriendlyString(),
-                        status = it.status
-                    )
-                }
+                models
+                    .sortedBy { it.startTime }
+                    .map {
+                        AppointmentSummary(
+                            id = it.id,
+                            patientName = it.patientName,
+                            startTime = it.startTime.toFriendlyString(),
+                            endTime = it.endTime.toFriendlyString(),
+                            status = it.status
+                        )
+                    }
             }
     }
 
