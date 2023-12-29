@@ -16,7 +16,7 @@ type Mutation {
         startTime: String
         endTime: String
         status: AppointmentStatus
-        lastUpdated: String,
+        lastUpdate: String
     ): Appointment!
 
     syncAppointments(

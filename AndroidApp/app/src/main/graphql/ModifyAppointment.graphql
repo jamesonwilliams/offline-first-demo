@@ -1,0 +1,19 @@
+mutation ModifyAppointment(
+    $id: ID!,
+    $lastUpdate: String!
+    $patientName: String,
+    $status: AppointmentStatus,
+    $startTime: String,
+    $endTime: String,
+) {
+    modifyAppointment(
+        id: $id,
+        lastUpdate: $lastUpdate,
+        patientName: $patientName,
+        status: $status,
+        startTime: $startTime,
+        endTime: $endTime,
+    ) {
+        ...appointmentFragment
+    }
+}

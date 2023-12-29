@@ -60,6 +60,7 @@ class AppointmentResolver @Autowired constructor(
         @Argument endTime: String? = null,
         @Argument patientName: String? = null,
         @Argument status: AppointmentStatus? = null,
+        @Argument lastUpdate: String? = null,
     ): Appointment {
         val existingAppointment =
             appointmentService.getAppointment(id)
@@ -72,7 +73,7 @@ class AppointmentResolver @Autowired constructor(
                     endTime = endTime?.let { OffsetDateTime.parse(it) } ?: existingAppointment.endTime,
                     patientName = patientName ?: existingAppointment.patientName,
                     status = status ?: existingAppointment.status,
-                    lastUpdated = OffsetDateTime.now(),
+                    lastUpdated = lastUpdate?.let { OffsetDateTime.parse(lastUpdate) } ?: OffsetDateTime.now(),
                 ),
         )
     }
