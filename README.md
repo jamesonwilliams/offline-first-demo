@@ -1,6 +1,6 @@
 # Clinician's Recording App
 
-This is toy app that displays appointment data for clinicians. The app
+This is a toy app that displays appointment data for clinicians. The app
 is split between an [Android client](AndroidApp) and a [GraphQL
 backend](Backend).
 
@@ -22,16 +22,16 @@ appointment status), or by remote updates on the server.
 
 ### Client Sync Protocol
 
-The client state and the server state can drift from on another when the
-app is offline. To address this, the app needs to reconcile state with
-the server.  Whenever the app [enters the
+The client state and the server state can drift apart when the
+app is offline. To address this, the app needs to reconcile the
+application state with the server.  Whenever the app [enters the
 foreground](https://github.com/jamesonwilliams/clinicians/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/AndroidApp/app/src/main/java/org/nosemaj/cra/data/sync/AppointmentSyncEngine.kt#L32),
 it starts listening to the OS for network connectivity. In addition to
-an initial sync, the app attempst to sync whenever it [regains network
+an initial sync, the app attempts to sync whenever it [regains network
 connectivity](https://github.com/jamesonwilliams/clinicians/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/AndroidApp/app/src/main/java/org/nosemaj/cra/data/sync/AppointmentSyncEngine.kt#L38).
 The sync procedure goes through these steps:
 
-1. "Cleaunp". Cancel any previous data transfer jobs that may exist.
+1. "Cleanup". Cancel any previous data transfer jobs that may exist.
 2. "Base sync". Send the client's version of the appointment list to the
    server. The server will perform conflict resolution and send back an
    updated list. Apply the server's view of appointments immediately to
@@ -62,8 +62,8 @@ adb shell am start -n org.nosemaj.cra/org.nosemaj.cra.ui.MainActivity
 
 #### Update Endpoint
 
-See notes below about howto run the web server locally. Be sure to
-update the Android app's `strings.xml` to point to your local webserver:
+See the notes below about how to run the web server locally. Be sure to
+update the Android app's `strings.xml` to point to your local web server:
 ```xml
 <resources>
     <string name="gql_base_url">http://YOUR_LOCAL_IP:8080/graphql</string>
@@ -91,25 +91,25 @@ updated Kotlin models based on it:
 
 ### Server Sync Protocol
 
-The server is the ultimate authority on state.  The server notifies the
+The server is the ultimate authority on the application state.  The server notifies the
 client of the canonical application state either through its response to
 the the sync mutation, or by delta updates over the realtime
 subscription.
 
-The backend considers the list of client appointments, and applies the
+The backend considers the list of client appointments and applies the
 following [logic to create a resolved
 list](https://github.com/jamesonwilliams/clinicians/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/Backend/src/main/kotlin/org/nosemaj/cra/service/AppointmentService.kt#L31):
-1. If an appointment only exists on the client or server, include it
-   is included into the resolved set;
+1. If an appointment only exists on the client or server, it
+   is included in the resolved set;
 2. If the appointment is on both the client and server, whichever
-   appointment one has a more recent `lastUpdated` value will be used.
+   version has a more recent `lastUpdated` value will be used.
    (See discussion of caveats below.)
 
 In addition, the server accepts ModifyAppointment mutations. These
 mutations may be triggered by the Android app or by the GraphiQL admin
 interface.  The server will [immediately
 broadcast](https://github.com/jamesonwilliams/clinicians/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/Backend/src/main/kotlin/org/nosemaj/cra/service/AppointmentService.kt#L17)
-any modified appointments over GraphQL subscription, if actice. The
+any modified appointments over GraphQL subscription, if active. The
 modified appointments will also be returned during the next sync
 operation, if they have the most recent `lastUpdated` value at that
 time.
@@ -117,18 +117,18 @@ time.
 ### Conflict Resolution Caveats
 
 There are a number of different ways to handle conflicts between
-appointments on the client and server. Currently the app resolves
+appointments on the client and server. Currently, the app resolves
 conflicts by picking whichever version has been updated more recently.
 This is a simple strategy, but it does have some downsides.
 
 For one, it assumes that the client and server agree on a clock, which
 may or may not be true. This could be de-risked by adding timing info in
-the sync command, so that the two can agree on an offset.
+the sync command so that the two can agree on an offset.
 
 Another downside is that it is not resilient to some more complex update
 scenarios, where both the client and server versions have been
-meaningful updated while out-of-touch. Consider the following sequence
-of evevents:
+meaningfully updated while out-of-touch. Consider the following sequence
+of events:
    1. At time 1, the client goes offline
    2. At time 2, the server cancels an appointment
    3. At time 3, the client begins recording for that appointment, updating its state
@@ -136,7 +136,7 @@ of evevents:
 
 In this sequence, the client will end up preserving its recording
 status, even though the server tried to cancel the appointment.
-Perhaps we would have liked to mark the appointment as cancelled in this
+Perhaps we would have liked to mark the appointment as canceled in this
 scenario, instead.
 
 Long term, these nuanced decisions should continue to be made by more
@@ -214,13 +214,13 @@ Initializr](https://start.spring.io/).
 
 * I chose Kotlin because it is modern, type-safe, and familiar.
 * In the JVM ecosystem, some popular server frameworks are Spring Boot
-and Ktor. I chose Spring Boot because I wasn't sure what all I'd include
+and Ktor. I chose Spring Boot because I wasn't sure what-all I'd include
 in the server to start, and wanted a broad ecosystem from which to draw
 on tools and documentation.
 * I chose an in-memory H2 database for simplicity.
 
-I chose GraphQL because I needed realtime communication, and among
-subscriptions solutions, GraphQL has some of the most robust tooling.
-I'm also more familiar with it than I am in using bare WebSockets or
+I chose GraphQL because I needed real-time communication, and among
+subscription solutions, GraphQL has some of the most robust tooling.
+I'm also more familiar with it than I am with using bare WebSockets or
 gRPC.
 
