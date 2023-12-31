@@ -13,7 +13,7 @@ Notion](https://www.notion.so/Mobile-Take-home-Ambient-Recording-App-for-Clinici
 ## Android App
 | App Appointment List | App Recording View |
 |--|--|
-|<img src="./screenshots/appointments-list.png" /> | <img src="./screenshots/appointment-detail.png" /> |
+|<img width="200" src="./screenshots/appointments-list.png" /> | <img width="200" src="./screenshots/appointment-detail.png" /> |
 
 The [Android App](./AndroidApp) is "offline first," and always displays
 data from its local database. The data in the database can either be
@@ -86,7 +86,7 @@ updated Kotlin models based on it:
 
 | Backend GraphiQL interface |
 |---|
-|<img src="./screenshots/graphiql-list-query.png" /> |
+|<img width="600" src="./screenshots/graphiql-list-query.png" /> |
 
 
 ### Server Sync Protocol
