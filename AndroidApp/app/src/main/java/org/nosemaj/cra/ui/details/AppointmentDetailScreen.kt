@@ -40,11 +40,12 @@ fun AppointmentDetailScreen(onBackPressed: () -> Unit) {
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
     when (val currentState = viewState) {
         is Loading -> LoadingUI()
-        is Content -> AppointmentDetailUi(
-            appointmentDetail = currentState.appointmentDetail,
-            onBackClicked = onBackPressed,
-            onRecordingRequested = { viewModel.onEvent(RecordRequested(it)) },
-        )
+        is Content ->
+            AppointmentDetailUi(
+                appointmentDetail = currentState.appointmentDetail,
+                onBackClicked = onBackPressed,
+                onRecordingRequested = { viewModel.onEvent(RecordRequested(it)) }
+            )
         is Error -> {
             ErrorUi(currentState.message) {
                 viewModel.onEvent(UiEvent.RetryClicked)
@@ -62,7 +63,7 @@ fun AppointmentDetailUi(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
     ) {
         BackBar {
             onBackClicked()
@@ -70,7 +71,7 @@ fun AppointmentDetailUi(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
         ) {
             TitleLine(appointmentDetail.patientName)
             DetailLine("Start: ${appointmentDetail.startTime}")
@@ -79,7 +80,7 @@ fun AppointmentDetailUi(
 
             RecordButton(
                 isRecording = appointmentDetail.status == Recording,
-                onRecordingRequested = onRecordingRequested,
+                onRecordingRequested = onRecordingRequested
             )
         }
     }

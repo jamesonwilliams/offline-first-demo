@@ -20,11 +20,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import java.util.UUID
 import org.nosemaj.cra.ui.list.UiEvent.InitialLoad
 import org.nosemaj.cra.ui.list.UiEvent.RetryClicked
 import org.nosemaj.cra.ui.shared.ErrorUi
 import org.nosemaj.cra.ui.shared.LoadingUI
-import java.util.UUID
 
 @Composable
 fun AppointmentListScreen(navigateToAppointment: (appointmentId: UUID) -> Unit) {
@@ -36,19 +36,21 @@ fun AppointmentListScreen(navigateToAppointment: (appointmentId: UUID) -> Unit) 
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
     when (val currentState = viewState) {
         is UiState.Loading -> LoadingUI()
-        is UiState.Content -> AppointmentList(currentState.appointmentSummaries) {
-            navigateToAppointment(it.id)
-        }
-        is UiState.Error -> ErrorUi(currentState.message) {
-            viewModel.onEvent(RetryClicked)
-        }
+        is UiState.Content ->
+            AppointmentList(currentState.appointmentSummaries) {
+                navigateToAppointment(it.id)
+            }
+        is UiState.Error ->
+            ErrorUi(currentState.message) {
+                viewModel.onEvent(RetryClicked)
+            }
     }
 }
 
 @Composable
 fun AppointmentList(
     appointmentSummaries: List<AppointmentSummary>,
-    onAppointmentClicked: (AppointmentSummary) -> Unit
+    onAppointmentClicked: (AppointmentSummary) -> Unit,
 ) {
     LazyColumn {
         item {
@@ -65,27 +67,27 @@ fun AppointmentList(
 @Composable
 fun Title(text: String) {
     Text(
-        text = "Appointments",
+        text = text,
         style = MaterialTheme.typography.headlineLarge,
         textAlign = TextAlign.Center,
         modifier = Modifier
             .padding(top = 16.dp, bottom = 16.dp)
             .fillMaxWidth(),
-        fontWeight = FontWeight.ExtraBold,
+        fontWeight = FontWeight.ExtraBold
     )
 }
 
 @Composable
 fun AppointmentItem(appointmentSummary: AppointmentSummary, onClicked: () -> Unit) {
     Column(
-        modifier = Modifier.clickable { onClicked() }
+        modifier = Modifier
+            .clickable { onClicked() }
             .fillMaxWidth()
             .padding(8.dp)
             .background(
                 color = Color.LightGray,
                 shape = RoundedCornerShape(8.dp)
-            )
-            .padding(16.dp)
+            ).padding(16.dp)
     ) {
         with(appointmentSummary) {
             Text(

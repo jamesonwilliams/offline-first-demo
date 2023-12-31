@@ -4,7 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import java.util.UUID
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,21 +20,27 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.withContext
+import org.nosemaj.cra.data.AppointmentModel
 import org.nosemaj.cra.data.AppointmentModel.AppointmentStatus
 import org.nosemaj.cra.data.AppointmentRepository
+import org.nosemaj.cra.di.IoDispatcher
+import org.nosemaj.cra.di.MainDispatcher
 import org.nosemaj.cra.ui.details.UiEvent.InitialLoad
+import org.nosemaj.cra.ui.details.UiEvent.RecordRequested
 import org.nosemaj.cra.ui.details.UiEvent.RetryClicked
 import org.nosemaj.cra.ui.details.UiState.Content
 import org.nosemaj.cra.ui.details.UiState.Error
 import org.nosemaj.cra.ui.details.UiState.Loading
-import org.nosemaj.cra.ui.shared.toFriendlyString
-import java.util.UUID
-import javax.inject.Inject
+import org.nosemaj.cra.util.toFriendlyString
 
 @HiltViewModel
-class AppointmentDetailViewModel @Inject constructor(
+class AppointmentDetailViewModel
+@Inject
+constructor(
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     private val appointmentRepository: AppointmentRepository,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val appointmentId = UUID.fromString(checkNotNull(savedStateHandle["appointmentId"]))
     private val _uiState = MutableStateFlow<UiState>(Loading)
@@ -42,7 +50,7 @@ class AppointmentDetailViewModel @Inject constructor(
         when (uiEvent) {
             is InitialLoad -> loadAppointment()
             is RetryClicked -> loadAppointment()
-            is UiEvent.RecordRequested -> toggleRecordState(uiEvent.shouldRecord)
+            is RecordRequested -> toggleRecordState(uiEvent.shouldRecord)
         }
     }
 
@@ -70,31 +78,23 @@ class AppointmentDetailViewModel @Inject constructor(
             .catch { throwable ->
                 updateState { Error(throwable.localizedMessage) }
             }
-            .launchIn(viewModelScope + Dispatchers.IO)
+            .launchIn(viewModelScope + ioDispatcher)
     }
 
     private fun appointmentDetail(): Flow<AppointmentDetail> {
-        return appointmentRepository.getAppointment(appointmentId = appointmentId)
-            .map { appointment ->
-                AppointmentDetail(
-                    id = appointment.id,
-                    patientName = appointment.patientName,
-                    startTime = appointment.startTime.toFriendlyString(),
-                    endTime = appointment.endTime.toFriendlyString(),
-                    status = appointment.status
-                )
-            }
+        return appointmentRepository.getAppointment(appointmentId)
+            .map { appointment -> appointment.toAppointmentDetail() }
     }
 
     private suspend fun updateState(updater: (oldState: UiState) -> UiState) {
-        withContext(Dispatchers.Main) { _uiState.update(updater) }
+        withContext(mainDispatcher) { _uiState.update(updater) }
     }
 }
 
 sealed class UiEvent {
     data object InitialLoad : UiEvent()
     data object RetryClicked : UiEvent()
-    data class RecordRequested(val shouldRecord: Boolean): UiEvent()
+    data class RecordRequested(val shouldRecord: Boolean) : UiEvent()
 }
 
 sealed class UiState {
@@ -108,5 +108,13 @@ data class AppointmentDetail(
     val patientName: String,
     val startTime: String,
     val endTime: String,
-    val status: AppointmentStatus
+    val status: AppointmentStatus,
+)
+
+internal fun AppointmentModel.toAppointmentDetail(): AppointmentDetail = AppointmentDetail(
+    id = id,
+    patientName = patientName,
+    startTime = startTime.toFriendlyString(),
+    endTime = endTime.toFriendlyString(),
+    status = status
 )

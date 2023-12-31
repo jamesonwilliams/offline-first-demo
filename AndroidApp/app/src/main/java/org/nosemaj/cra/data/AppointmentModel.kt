@@ -2,8 +2,8 @@ package org.nosemaj.cra.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.datetime.Instant
 import java.util.UUID
+import kotlinx.datetime.Instant
 
 // Yes, we're sharing a model across a few modules.
 // Ends up significantly cutting down on maintenance in this small proj.
@@ -22,6 +22,6 @@ data class AppointmentModel(
         Recording,
         Paused,
         Completed,
-        Cancelled
+        Cancelled,
     }
 }

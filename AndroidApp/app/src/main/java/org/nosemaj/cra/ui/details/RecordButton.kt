@@ -24,10 +24,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import org.nosemaj.cra.R
 
 @Composable
-fun RecordButton(
-    isRecording: Boolean,
-    onRecordingRequested: (Boolean) -> Unit,
-) {
+fun RecordButton(isRecording: Boolean, onRecordingRequested: (Boolean) -> Unit) {
     RecordingPermissions {
         Box(
             modifier = Modifier
@@ -35,9 +32,8 @@ fun RecordButton(
                 .size(120.dp)
                 .background(
                     color = if (isRecording) Color.Red else Color.DarkGray,
-                    shape = RoundedCornerShape(32.dp),
-                )
-                .clickable {
+                    shape = RoundedCornerShape(32.dp)
+                ).clickable {
                     onRecordingRequested(!isRecording)
                 }
                 .fillMaxSize(),
@@ -47,7 +43,8 @@ fun RecordButton(
                 painter = painterResource(id = R.drawable.baseline_mic_24),
                 contentDescription = "Record audio",
                 tint = Color.White,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier
+                    .size(40.dp)
                     .padding(8.dp)
             )
             Text(
@@ -62,9 +59,7 @@ fun RecordButton(
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun RecordingPermissions(
-   onGranted: @Composable () -> Unit,
-) {
+fun RecordingPermissions(onGranted: @Composable () -> Unit) {
     val recordPermissionState = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
 
     when {

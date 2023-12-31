@@ -3,7 +3,9 @@ package org.nosemaj.cra.ui.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import java.util.UUID
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,20 +18,25 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.withContext
+import org.nosemaj.cra.data.AppointmentModel
 import org.nosemaj.cra.data.AppointmentModel.AppointmentStatus
 import org.nosemaj.cra.data.AppointmentRepository
+import org.nosemaj.cra.di.IoDispatcher
+import org.nosemaj.cra.di.MainDispatcher
 import org.nosemaj.cra.ui.list.UiEvent.InitialLoad
 import org.nosemaj.cra.ui.list.UiEvent.RetryClicked
 import org.nosemaj.cra.ui.list.UiState.Content
 import org.nosemaj.cra.ui.list.UiState.Error
 import org.nosemaj.cra.ui.list.UiState.Loading
-import org.nosemaj.cra.ui.shared.toFriendlyString
-import java.util.UUID
-import javax.inject.Inject
+import org.nosemaj.cra.util.toFriendlyString
 
 @HiltViewModel
-class AppointmentListViewModel @Inject constructor(
-    private val appointmentRepository: AppointmentRepository
+class AppointmentListViewModel
+@Inject
+constructor(
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    private val appointmentRepository: AppointmentRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<UiState>(Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -62,28 +69,21 @@ class AppointmentListViewModel @Inject constructor(
             .catch { throwable ->
                 updateState { Error(throwable.localizedMessage) }
             }
-            .launchIn(viewModelScope + Dispatchers.IO)
+            .launchIn(viewModelScope + ioDispatcher)
     }
 
     private fun appointmentSummaries(): Flow<List<AppointmentSummary>> {
-        return appointmentRepository.getAppointments()
+        return appointmentRepository
+            .getAppointments()
             .map { models ->
                 models
                     .sortedBy { it.startTime }
-                    .map {
-                        AppointmentSummary(
-                            id = it.id,
-                            patientName = it.patientName,
-                            startTime = it.startTime.toFriendlyString(),
-                            endTime = it.endTime.toFriendlyString(),
-                            status = it.status
-                        )
-                    }
+                    .map { it.toAppointmentSummary() }
             }
     }
 
     private suspend fun updateState(updater: (oldState: UiState) -> UiState) {
-        withContext(Dispatchers.Main) { _uiState.update(updater) }
+        withContext(mainDispatcher) { _uiState.update(updater) }
     }
 }
 
@@ -103,5 +103,13 @@ data class AppointmentSummary(
     val patientName: String,
     val startTime: String,
     val endTime: String,
-    val status: AppointmentStatus
+    val status: AppointmentStatus,
+)
+
+internal fun AppointmentModel.toAppointmentSummary(): AppointmentSummary = AppointmentSummary(
+    id = id,
+    patientName = patientName,
+    startTime = startTime.toFriendlyString(),
+    endTime = endTime.toFriendlyString(),
+    status = status
 )
