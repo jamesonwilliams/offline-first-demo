@@ -191,8 +191,8 @@ mutation {
 mutation {
   modifyAppointment(
     id: "7489aec0-611c-46b4-be63-cb6c4a9c834c",
-    status:Cancelled,
-    patientName:"Jon Friedman"
+    status: Cancelled,
+    patientName: "Jon Friedman"
   ) {
     id
   }
