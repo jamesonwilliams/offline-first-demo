@@ -8,7 +8,9 @@ import org.nosemaj.cra.data.AppointmentModel
 class FakeAppointmentDao : AppointmentDao {
     private val dbItems = mutableListOf<AppointmentModel>()
 
-    override fun observeAll(): Flow<List<AppointmentModel>> = flowOf(dbItems)
+    override fun observeAll(): Flow<List<AppointmentModel>> {
+        return flowOf(dbItems.sortedBy { it.startTime })
+    }
 
     override fun observeById(appointmentId: UUID): Flow<AppointmentModel> {
         return flowOf(dbItems.first { it.id == appointmentId })
@@ -18,7 +20,9 @@ class FakeAppointmentDao : AppointmentDao {
         return dbItems.first { it.id == appointmentId }
     }
 
-    override suspend fun getAll(): List<AppointmentModel> = dbItems
+    override suspend fun getAll(): List<AppointmentModel> {
+        return dbItems.sortedBy { it.startTime }
+    }
 
     override suspend fun upsert(vararg appointment: AppointmentModel) {
         upsertAll(appointment.toList())

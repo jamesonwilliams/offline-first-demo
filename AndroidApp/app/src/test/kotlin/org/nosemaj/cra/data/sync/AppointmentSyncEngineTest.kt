@@ -45,8 +45,8 @@ class AppointmentSyncEngineTest {
 
         // Assert: both are in the local database, now.
         assertEquals(
-            (clientOnly + serverOnly).sortedBy { it.startTime },
-            fakeAppointmentDao.getAll()
+            (clientOnly + serverOnly).sortedBy { it.id },
+            fakeAppointmentDao.getAll().sortedBy { it.id }
         )
     }
 }
