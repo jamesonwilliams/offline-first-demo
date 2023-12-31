@@ -3,7 +3,7 @@ package org.nosemaj.cra.entity
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 data class Appointment(

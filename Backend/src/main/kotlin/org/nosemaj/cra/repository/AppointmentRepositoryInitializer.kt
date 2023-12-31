@@ -7,13 +7,12 @@ import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Component
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 
 @Component
 class AppointmentRepositoryInitializer @Autowired private constructor(
     private val appointmentRepository: AppointmentRepository,
-): ApplicationRunner {
-
+) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
         appointmentRepository.saveAllAndFlush(
             listOf(
@@ -23,7 +22,7 @@ class AppointmentRepositoryInitializer @Autowired private constructor(
                     startTime = OffsetDateTime.parse("2024-03-15T08:30:00-06:00"),
                     endTime = OffsetDateTime.parse("2024-03-15T09:00:00-06:00"),
                     status = AppointmentStatus.Scheduled,
-                    lastUpdated = OffsetDateTime.parse("2023-12-28T20:00:00-06:00")
+                    lastUpdated = OffsetDateTime.parse("2023-12-28T20:00:00-06:00"),
                 ),
                 Appointment(
                     id = UUID.fromString("055f7e09-279c-47ab-915e-475b248091ec"),
@@ -31,9 +30,9 @@ class AppointmentRepositoryInitializer @Autowired private constructor(
                     startTime = OffsetDateTime.parse("2024-02-22T11:30:00-06:00"),
                     endTime = OffsetDateTime.parse("2024-02-22T12:15:00-06:00"),
                     status = AppointmentStatus.Scheduled,
-                    lastUpdated = OffsetDateTime.parse("2023-12-28T20:00:00-06:00")
-                )
-            )
+                    lastUpdated = OffsetDateTime.parse("2023-12-28T20:00:00-06:00"),
+                ),
+            ),
         )
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.graphql.data.method.annotation.SubscriptionMapping
 import org.springframework.stereotype.Controller
 import reactor.core.publisher.Flux
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 
 @Controller
 class AppointmentResolver @Autowired constructor(
@@ -23,7 +23,9 @@ class AppointmentResolver @Autowired constructor(
     }
 
     @QueryMapping
-    fun getAppointment(@Argument id: UUID): Appointment? {
+    fun getAppointment(
+        @Argument id: UUID,
+    ): Appointment? {
         return appointmentService.getAppointment(id)
     }
 
@@ -48,7 +50,7 @@ class AppointmentResolver @Autowired constructor(
 
     @MutationMapping
     fun syncAppointments(
-        @Argument clientAppointments: List<Appointment>
+        @Argument clientAppointments: List<Appointment>,
     ): List<Appointment> {
         return appointmentService.syncAppointments(clientAppointments)
     }
@@ -65,17 +67,16 @@ class AppointmentResolver @Autowired constructor(
         val existingAppointment =
             appointmentService.getAppointment(id)
                 ?: throw Error("No appointment with ID $id to update!")
-        return appointmentService.saveAppointment(
-            requestedAppointment =
-                Appointment(
-                    id = id,
-                    startTime = startTime?.let { OffsetDateTime.parse(it) } ?: existingAppointment.startTime,
-                    endTime = endTime?.let { OffsetDateTime.parse(it) } ?: existingAppointment.endTime,
-                    patientName = patientName ?: existingAppointment.patientName,
-                    status = status ?: existingAppointment.status,
-                    lastUpdated = lastUpdate?.let { OffsetDateTime.parse(lastUpdate) } ?: OffsetDateTime.now(),
-                ),
-        )
+        val updatedAppointment =
+            Appointment(
+                id = id,
+                startTime = startTime?.let { OffsetDateTime.parse(it) } ?: existingAppointment.startTime,
+                endTime = endTime?.let { OffsetDateTime.parse(it) } ?: existingAppointment.endTime,
+                patientName = patientName ?: existingAppointment.patientName,
+                status = status ?: existingAppointment.status,
+                lastUpdated = lastUpdate?.let { OffsetDateTime.parse(lastUpdate) } ?: OffsetDateTime.now(),
+            )
+        return appointmentService.saveAppointment(updatedAppointment)
     }
 
     @SubscriptionMapping

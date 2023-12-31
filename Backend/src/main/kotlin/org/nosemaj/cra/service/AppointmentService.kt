@@ -22,7 +22,8 @@ class AppointmentService @Autowired constructor(
         return savedAppointment
     }
 
-    fun listAppointments(): List<Appointment> = appointmentRepository.findAll(Sort.by(Sort.Direction.ASC, "startTime"))
+    fun listAppointments(): List<Appointment> =
+        appointmentRepository.findAll(Sort.by(Sort.Direction.ASC, "startTime"))
 
     fun getAppointment(id: UUID): Appointment? = appointmentRepository.findByIdOrNull(id)
 
@@ -54,7 +55,7 @@ class AppointmentService @Autowired constructor(
             }
             .forEach { (client, server) ->
                 resolvedAppointments.add(
-                    resolve(client, server)
+                    resolve(client, server),
                 )
             }
 

@@ -7,3 +7,11 @@ indent_size = 4
 trim_trailing_whitespace = true
 insert_final_newline = true
 end_of_line = lf
+indent_size = 4
+max_line_length = 120
+
+[*.{kt,kts}]
+ktlint_standard_function-expression-body = disabled
+ktlint_standard_function-signature = disabled
+ij_kotlin_allow_trailing_comma = true
+

@@ -12,7 +12,7 @@ import org.springframework.graphql.test.tester.WebSocketGraphQlTester
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient
 import reactor.test.StepVerifier
 import java.net.URI
-import java.util.*
+import java.util.UUID
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
@@ -40,7 +40,8 @@ class GraphQLTests {
                       }
                     }
                     """,
-                ).execute()
+                )
+                .execute()
                 .path("addAppointment.id")
                 .entity(UUID::class.java)
                 .get()
@@ -55,7 +56,8 @@ class GraphQLTests {
                   }
                 }
                 """,
-            ).execute()
+            )
+            .execute()
             .path("modifyAppointment.status")
             .entity(AppointmentStatus::class.java)
             .isEqualTo(AppointmentStatus.Recording)
@@ -70,7 +72,8 @@ class GraphQLTests {
                   }
                 }
                 """,
-            ).execute()
+            )
+            .execute()
             .path("listAppointments[*].patientName")
             .entityList(String::class.java)
             .contains("Greggory Sampson")
@@ -92,7 +95,8 @@ class GraphQLTests {
                       }
                     }
                     """,
-                ).executeSubscription()
+                )
+                .executeSubscription()
                 .toFlux("appointmentChange.patientName", String::class.java)
 
         // Create an appointment
@@ -109,7 +113,8 @@ class GraphQLTests {
                   }
                 }
                 """,
-            ).execute()
+            )
+            .execute()
 
         // Expect a subscription event
         StepVerifier
