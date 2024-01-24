@@ -1,14 +1,15 @@
-# Clinician's Recording App
+# Offline First Demo
 
-This is a toy app that displays appointment data for clinicians. The app
-is split between an [Android client](AndroidApp) and a [GraphQL
-backend](Backend).
+This is a toy app that showcases an offline-first client-server
+architecture with data synchronization and realtime sync when back
+online.
 
-This project was completed as part of an application to [Ambience
-Healthcare](https://www.ambiencehealthcare.com/).
+The project is split between an [Android client](AndroidApp) and a
+[GraphQL backend](Backend).
 
-The project requirements can be found [on
-Notion](https://www.notion.so/Mobile-Take-home-Ambient-Recording-App-for-Clinicians-0db65cb8728f4f1b8d6abeb13d81a60c?pvs=5).
+For sake of argument the app assumes some toy data models, imaging a
+psychologist who has appointments and records voice notes during each
+appointment. (Audio recording feature is not implemented here.)
 
 ## Android App
 | App Appointment List | App Recording View |
@@ -25,10 +26,10 @@ appointment status), or by remote updates on the server.
 The client state and the server state can drift apart when the
 app is offline. To address this, the app needs to reconcile the
 application state with the server.  Whenever the app [enters the
-foreground](https://github.com/jamesonwilliams/clinicians/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/AndroidApp/app/src/main/java/org/nosemaj/cra/data/sync/AppointmentSyncEngine.kt#L32),
+foreground](https://github.com/jamesonwilliams/offline-first-demo/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/AndroidApp/app/src/main/java/org/nosemaj/cra/data/sync/AppointmentSyncEngine.kt#L32),
 it starts listening to the OS for network connectivity. In addition to
 an initial sync, the app attempts to sync whenever it [regains network
-connectivity](https://github.com/jamesonwilliams/clinicians/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/AndroidApp/app/src/main/java/org/nosemaj/cra/data/sync/AppointmentSyncEngine.kt#L38).
+connectivity](https://github.com/jamesonwilliams/offline-first-demo/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/AndroidApp/app/src/main/java/org/nosemaj/cra/data/sync/AppointmentSyncEngine.kt#L38).
 The sync procedure goes through these steps:
 
 1. "Cleanup". Cancel any previous data transfer jobs that may exist.
@@ -41,7 +42,7 @@ The sync procedure goes through these steps:
 
 The client may update an appointment's local status at any point, due to
 user interaction. The client [saves the new
-status](https://github.com/jamesonwilliams/clinicians/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/AndroidApp/app/src/main/java/org/nosemaj/cra/data/AppointmentRepository.kt#L24)
+status](https://github.com/jamesonwilliams/offline-first-demo/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/AndroidApp/app/src/main/java/org/nosemaj/cra/data/AppointmentRepository.kt#L24)
 optimistically, and increases the local `lastUpdated` field when it does
 so. Updating the `lastUpdated` field ensures that the local copy of the
 appointment will not be overwritten during the next sync. In addition,
@@ -98,7 +99,7 @@ subscription.
 
 The backend considers the list of client appointments and applies the
 following [logic to create a resolved
-list](https://github.com/jamesonwilliams/clinicians/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/Backend/src/main/kotlin/org/nosemaj/cra/service/AppointmentService.kt#L31):
+list](https://github.com/jamesonwilliams/offline-first-demo/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/Backend/src/main/kotlin/org/nosemaj/cra/service/AppointmentService.kt#L31):
 1. If an appointment only exists on the client or server, it
    is included in the resolved set;
 2. If the appointment is on both the client and server, whichever
@@ -108,7 +109,7 @@ list](https://github.com/jamesonwilliams/clinicians/blob/b8fb5cb218375bdaef946d1
 In addition, the server accepts ModifyAppointment mutations. These
 mutations may be triggered by the Android app or by the GraphiQL admin
 interface.  The server will [immediately
-broadcast](https://github.com/jamesonwilliams/clinicians/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/Backend/src/main/kotlin/org/nosemaj/cra/service/AppointmentService.kt#L17)
+broadcast](https://github.com/jamesonwilliams/offline-first-demo/blob/b8fb5cb218375bdaef946d1b99cf753d08de4af5/Backend/src/main/kotlin/org/nosemaj/cra/service/AppointmentService.kt#L17)
 any modified appointments over GraphQL subscription, if active. The
 modified appointments will also be returned during the next sync
 operation, if they have the most recent `lastUpdated` value at that

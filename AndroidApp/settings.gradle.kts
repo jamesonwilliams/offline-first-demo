@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Clinician's Assistant"
+rootProject.name = "Offline First Demo"
 include(":app")

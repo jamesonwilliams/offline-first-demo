@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Clinician\'s Assistant</string>
+    <string name="app_name">Offline First Demo</string>
     <string name="gql_base_url">http://192.168.0.152:8080/graphql</string>
     <string name="gql_subscription_base_url">http://192.168.0.152:8080/graphql</string>
 </resources>
